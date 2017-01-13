@@ -8,71 +8,44 @@ namespace NearestNeighborhood.Algorithm
     public class NearestNeighborhoodAlgorithm
     {
         private readonly int _k;
-        private readonly UserToSongMap _userToSongMap;
-        private Dictionary<string, SortedSet<SimilarUser>> _similarityMap;
+        private readonly UsersListenHistory _usersListenHistory;
+        private SimilarUsers _similarUsers;
 
-        public NearestNeighborhoodAlgorithm(UserToSongMap userToSongMap, int k = 100)
+        public NearestNeighborhoodAlgorithm(UsersListenHistory usersListenHistory, int k = 100)
         {
-            _userToSongMap = userToSongMap;
+            _usersListenHistory = usersListenHistory;
             _k = k;
-            _similarityMap = new Dictionary<string, SortedSet<SimilarUser>>();
         }
 
-        public Dictionary<string, SortedSet<SimilarUser>> Find(int forUsers = -1)
+        public SimilarUsers FindNearest(int similarUsersCount)
         {
-            string[] users;
+            _similarUsers = new SimilarUsers(similarUsersCount);
 
-            if (forUsers > 0)
-                users = _userToSongMap.Users.Take(_k).ToArray();
-            else
-                users = _userToSongMap.Users.ToArray();
+            var coreUseres = GetCoreUseres(similarUsersCount);
 
-            foreach (var user in users)
+            foreach (var coreUser in coreUseres)
             {
-                var userSongs = _userToSongMap.GetSongsForUser(user);
+                var coreUserSongs = UserSongs(coreUser);
 
-                foreach (var similarUser in _userToSongMap.Users)
+                foreach (var similarUser in _usersListenHistory.GetUseresWithoutSelf(coreUser))
                 {
-                    var similarUserSongs = _userToSongMap.GetSongsForUser(similarUser);
+                    var similarUserSongs = UserSongs(similarUser);
 
-                    var similarity = MeasuereSimiliarity(userSongs, similarUserSongs);
+                    var similarity = MeasuereSimiliarity(coreUserSongs, similarUserSongs);
 
-                    AddSimilarUser(user, similarity, similarUser);
+                    AddSimilarUser(coreUser, similarity, similarUser);
                 }
             }
 
-            return _similarityMap;
+            return _similarUsers;
         }
 
-        private static void AddSimilarUser(double similarity, string similarUserId, SortedSet<SimilarUser> similarUsers)
-        {
-            similarUsers.Add(new SimilarUser(similarUserId, similarity));
-        }
+        private void AddSimilarUser(string userId, double similarity, string similarUserId) => _similarUsers
+            .AddUserSimilarUser(userId, SimilarUsers.CreateSimilarUser(similarUserId, similarity));
 
-        private void AddSimilarUser(string userId, double similarity, string similarUserId)
-        {
-            if (_similarityMap.ContainsKey(userId))
-            {
-                InserSimilarUser(userId, similarity, similarUserId);
-            }
-            else
-            {
-                _similarityMap[userId] = new SortedSet<SimilarUser>(SimilarUser.SimilarUserComparer);
-            }
-        }
-
-        private void InserSimilarUser(string userId, double similarity, string similarUserId)
-        {
-            var similarUsers = _similarityMap[userId];
-            if (similarUsers.Count == _k)
-            {
-                ReplaceWithLoweSimilarity(similarity, similarUserId, similarUsers);
-            }
-            else
-            {
-                AddSimilarUser(similarity, similarUserId, similarUsers);
-            }
-        }
+        private string[] GetCoreUseres(int similarUsersCount) => similarUsersCount > 0 ?
+            _usersListenHistory.Users.Take(_k).ToArray() :
+            _usersListenHistory.Users.ToArray();
 
         private double MeasuereSimiliarity(ICollection<string> firstUserSongs, ICollection<string> secondUserSongs)
         {
@@ -82,12 +55,6 @@ namespace NearestNeighborhood.Algorithm
             return intersectedCount / uninonCount;
         }
 
-        private void ReplaceWithLoweSimilarity(double similarity, string similarUserId, SortedSet<SimilarUser> similarUsers)
-        {
-            if (!(similarity > similarUsers.Min.Similarity))
-                return;
-            similarUsers.Remove(similarUsers.Min);
-            AddSimilarUser(similarity, similarUserId, similarUsers);
-        }
+        private ICollection<string> UserSongs(string userId) => _usersListenHistory.GetSongsForUser(userId);
     }
 }
