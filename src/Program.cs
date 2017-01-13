@@ -21,24 +21,36 @@ namespace NearestNeighborhood
 
             stopwatch.Start();
 
-            var userToSongMap = dataLoader.Data;
+            var listenHistory = dataLoader.Data;
 
             stopwatch.Stop();
 
-            Console.WriteLine($"Loaded {nameof(userToSongMap)}  in {stopwatch.ElapsedMilliseconds} ms.");
+            Console.WriteLine($"Loaded {nameof(listenHistory)}  in {stopwatch.Elapsed.Seconds} s.");
 
-            Console.ReadKey();
+            var similarUseres = 100;
 
-            var knearest = new NearestNeighborhoodAlgorithm(userToSongMap);
+            var nearestNeighborhoodAlgorithm = new NearestNeighborhoodAlgorithm(listenHistory);
 
-            var result = knearest.Find(100);
+            stopwatch.Start();
+
+            var result = nearestNeighborhoodAlgorithm.FindNearest(similarUseres);
+
+            stopwatch.Stop();
+
+            Console.WriteLine($"Found {100} similar users for {similarUseres} users in {stopwatch.Elapsed.Seconds} s.");
+
+            Console.WriteLine($"Write results to file {resultPath}");
 
             WriteResults(result, resultPath);
+
+            Console.Beep(80, 500);
+
+            Console.ReadKey();
         }
 
-        private static void WriteResults(Dictionary<string, SortedSet<SimilarUser>> result, string resultPath)
+        private static void WriteResults(SimilarUsers result, string resultPath)
         {
-            var jsonResult = JsonConvert.SerializeObject(result);
+            var jsonResult = JsonConvert.SerializeObject(result, Formatting.Indented);
 
             using (var stream = File.Create(resultPath))
             {

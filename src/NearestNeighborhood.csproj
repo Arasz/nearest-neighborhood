@@ -54,6 +54,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -63,9 +64,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithm\NearestNeighborhoodAlgorithm.cs" />
-    <Compile Include="Algorithm\SimilarUser.cs" />
+    <Compile Include="Data\SimilarUser.cs" />
     <Compile Include="Data\DataLoader.cs" />
-    <Compile Include="Data\UserToSongMap.cs" />
+    <Compile Include="Data\SimilarUsers.cs" />
+    <Compile Include="Data\UsersListenHistory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -73,9 +75,7 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Algorithm\SimilarityMeasure\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\Accord.3.4.0\build\Accord.targets" Condition="Exists('packages\Accord.3.4.0\build\Accord.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
