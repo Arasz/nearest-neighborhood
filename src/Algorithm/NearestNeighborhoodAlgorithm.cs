@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Data;
+﻿using NearestNeighborhood.Data;
+using System.Collections.Generic;
 using System.Linq;
-using NearestNeighborhood.Data;
 
 namespace NearestNeighborhood.Algorithm
 {
@@ -27,11 +26,11 @@ namespace NearestNeighborhood.Algorithm
             {
                 var coreUserSongs = UserSongs(coreUser);
 
-                foreach (var similarUser in _usersListenHistory.GetUseresWithoutSelf(coreUser))
+                foreach (var similarUser in _usersListenHistory.Users)
                 {
                     var similarUserSongs = UserSongs(similarUser);
 
-                    var similarity = MeasuereSimiliarity(coreUserSongs, similarUserSongs);
+                    var similarity = MeasureSimilarity(coreUserSongs, similarUserSongs);
 
                     AddSimilarUser(coreUser, similarity, similarUser);
                 }
@@ -47,10 +46,14 @@ namespace NearestNeighborhood.Algorithm
             _usersListenHistory.Users.Take(_k).ToArray() :
             _usersListenHistory.Users.ToArray();
 
-        private double MeasuereSimiliarity(ICollection<string> firstUserSongs, ICollection<string> secondUserSongs)
+        private double MeasureSimilarity(ICollection<string> firstUserSongs, ICollection<string> secondUserSongs)
         {
-            var intersectedCount = (double)firstUserSongs.Intersect(secondUserSongs).Count();
-            var uninonCount = (double)firstUserSongs.Union(secondUserSongs).Count();
+            var intersectedCount = firstUserSongs.Intersect(secondUserSongs).Count();
+
+            if (intersectedCount == 0)
+                return intersectedCount;
+
+            var uninonCount = (double)(firstUserSongs.Count + secondUserSongs.Count - intersectedCount);
 
             return intersectedCount / uninonCount;
         }

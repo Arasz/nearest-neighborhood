@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using NearestNeighborhood.Algorithm;
+using NearestNeighborhood.Data;
+using Newtonsoft.Json;
+using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
-using NearestNeighborhood.Algorithm;
-using NearestNeighborhood.Data;
-using Newtonsoft.Json;
+using System.Linq;
 
 namespace NearestNeighborhood
 {
@@ -50,7 +50,10 @@ namespace NearestNeighborhood
 
         private static void WriteResults(SimilarUsers result, string resultPath)
         {
-            var jsonResult = JsonConvert.SerializeObject(result, Formatting.Indented);
+            var sortedObject = result.SimilarUsersForUser.ToDictionary(pair => pair.Key,
+                pair => pair.Value.OrderByDescending(user => user.Similarity).ToList());
+
+            var jsonResult = JsonConvert.SerializeObject(sortedObject, Formatting.Indented);
 
             using (var stream = File.Create(resultPath))
             {
