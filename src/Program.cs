@@ -27,7 +27,7 @@ namespace NearestNeighborhood
 
             Console.WriteLine($"Loaded {nameof(listenHistory)}  in {stopwatch.Elapsed.Seconds} s.");
 
-            var similarUseres = 100;
+            var similarUseres = listenHistory.Users.Count;
 
             var nearestNeighborhoodAlgorithm = new NearestNeighborhoodAlgorithm(listenHistory);
 

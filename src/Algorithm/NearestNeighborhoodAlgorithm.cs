@@ -18,7 +18,7 @@ namespace NearestNeighborhood.Algorithm
 
         public SimilarUsers FindNearest(int similarUsersCount)
         {
-            _similarUsers = new SimilarUsers(similarUsersCount);
+            _similarUsers = new SimilarUsers(_k);
 
             var coreUseres = GetCoreUseres(similarUsersCount);
 
@@ -43,7 +43,7 @@ namespace NearestNeighborhood.Algorithm
             .AddUserSimilarUser(userId, SimilarUsers.CreateSimilarUser(similarUserId, similarity));
 
         private string[] GetCoreUseres(int similarUsersCount) => similarUsersCount > 0 ?
-            _usersListenHistory.Users.Take(_k).ToArray() :
+            _usersListenHistory.Users.Take(similarUsersCount).ToArray() :
             _usersListenHistory.Users.ToArray();
 
         private double MeasureSimilarity(ICollection<string> firstUserSongs, ICollection<string> secondUserSongs)
